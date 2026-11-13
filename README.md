@@ -1,170 +1,69 @@
-# OmniEye — Landing Page
+# OmniEye Website
 
-Single high-converting landing page + Privacy Policy page for **OmniEye**, the
-intent-aware AI desktop overlay (tagline: **SAS — See · Analyze · Show**).
-Built with **Next.js 16 (App Router) + TypeScript + Tailwind CSS 4**, design
-concept: **the Drawing Sheet** — crop marks, hairline dimension lines, mono
-sheet numbers, title-block footer. Palette: ink `#0D0C12`, midnight `#101A30`,
-bone `#EAE3D2`, aureate `#E7B24A`, sapphire `#4D7CFF` (capture states only),
-ember `#E8553F` (Blind state / errors).
+OmniEye's marketing website, product demo, privacy page, and beta waitlist.
 
-## Quick start
+## Technology
 
-```bash
-bun install
-bun run dev        # http://localhost:3000
-bun run lint       # ESLint
-bun run db:push    # create/update the SQLite db (waitlist fallback store)
-```
+Next.js App Router, React, TypeScript, Tailwind CSS, and Prisma with SQLite.
 
-## Environment variables
+## Setup
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `DATABASE_URL` | yes | SQLite file (already set in `.env`) — stores waitlist entries and powers duplicate-email detection. |
-| `NEXT_PUBLIC_SITE_URL` | prod | Canonical origin, e.g. `https://getomnieye.com`. Drives metadata, sitemap, robots. |
-| `DEMO_VIDEO_URL` | no | One-line demo video config (see below). |
-| `WAITLIST_WEBHOOK_URL` | prod | Google Apps Script web-app URL that appends rows to the client's Google Sheet. |
-| `WAITLIST_SECRET` | prod | Shared secret checked by the Apps Script. |
-| `NOTIFY_EMAIL` | prod | Passed through to the script; the inbox that receives instant sign-up notifications. |
+Requirements: Node.js 20.9 or later and npm.
 
-Copy lives in `src/components/omnieye/*` — every section is one file, with the
-client's verbatim copy as plain text (hero.tsx, problem.tsx, how-it-works.tsx,
-features.tsx, about.tsx, industries.tsx, final-cta.tsx, footer.tsx,
-privacy/page.tsx).
+1. Install dependencies with `npm install`.
+2. Copy `.env.example` to `.env`. Set `DATABASE_URL` to a SQLite file, for
+   example `file:./dev.db` (relative to `prisma/schema.prisma`). Set
+   `NEXT_PUBLIC_SITE_URL` to the site's origin when known. The remaining
+   integrations are optional for local development.
+3. Generate the Prisma client and create/update the local database:
+   `npm run db:generate` and `npm run db:push`.
+4. Start the development server with `npm run dev` and open
+   `http://localhost:3000`.
+5. Create a production build with `npm run build`; run it with `npm run start`.
 
-## Demo video (one config value)
+## Environment
 
-The hero button and video box open an accessible modal. The client's delivered
-demo (15-second walkthrough, hosted on Jumpshare) is wired in as the default;
-override it any time with:
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | SQLite connection string used by Prisma and the waitlist. |
+| `NEXT_PUBLIC_SITE_URL` | Public site origin for canonical metadata, sitemap, and robots. |
+| `SITE_URL` | Fallback site origin when `NEXT_PUBLIC_SITE_URL` is unset. |
+| `DEMO_VIDEO_URL` | Optional URL for the demo modal; defaults to the included video. |
+| `WAITLIST_WEBHOOK_URL` | Optional Google Apps Script web-app endpoint. |
+| `WAITLIST_SECRET` | Shared secret validated by the Apps Script endpoint. |
+| `NOTIFY_EMAIL` | Optional notification address sent to the Apps Script endpoint. |
 
-```bash
-DEMO_VIDEO_URL="https://jumpshare.com/embed/S18O80bFo59a70lm79Tf"  # Jumpshare
-DEMO_VIDEO_URL="https://www.youtube.com/watch?v=XXXXXXXXXXX"       # or YouTube
-DEMO_VIDEO_URL="https://player.vimeo.com/video/000000"             # or Vimeo
-DEMO_VIDEO_URL="https://cdn.example.com/demo.mp4"                  # or direct file
-```
+## Demo video
 
-Supported: Jumpshare share/embed links (embedded via `jumpshare.com/embed`),
-YouTube via `youtube-nocookie.com`, Vimeo via the Vimeo player, and direct
-`.mp4/.webm/.mov` links in a native `<video>` element. Nothing autoplays.
-If the variable is set to an empty string, the modal falls back to a clean
-placeholder (poster frame + "Demo video coming soon" + a button to the
-waitlist form).
+Set `DEMO_VIDEO_URL` in the deployment environment (or local `.env`) to the
+video's public URL. The modal supports Jumpshare, YouTube, Vimeo, and direct
+video URLs. Leave it empty to use `public/videos/omnieye-demo.mp4`.
 
-Real product assets (hero poster, industry captures, concept frames,
-storyboard, emblem) live in `public/mockups/` and `public/brand/`; regenerate
-them from the originals with `python3 scripts/prepare-assets.py`, and the OG
-image with `python3 scripts/generate-og.py`.
+## Waitlist and Google Sheets
 
-## Waitlist integration (Google Sheet + email notification)
+The form submits to `POST /api/waitlist`. The server validates and stores each
+entry in SQLite, then forwards it to `WAITLIST_WEBHOOK_URL` when configured.
+Deploy a Google Apps Script web app that validates the shared secret and
+appends the submitted name, email, role, page URL, and campaign data to the
+desired sheet. Configure its deployment URL, matching `WAITLIST_SECRET`, and
+optional `NOTIFY_EMAIL` in the hosting environment. Without a webhook, entries
+remain in SQLite.
 
-Flow: form → `POST /api/waitlist` (serverless route) → (a) stored in SQLite
-for duplicate detection, (b) forwarded to the client's Google Apps Script web
-app, which appends a row (timestamp, name, email, role, page URL, UTM) and
-emails the owner. Posting server-side avoids the opaque-response and CORS
-problems of posting straight to Apps Script from the browser.
+## Deployment
 
-The script (paste into Extensions → Apps Script on the Google Sheet):
+Deploy as a Node.js Next.js application. Configure the environment variables
+in the hosting provider, generate the Prisma client, apply the schema with
+`npm run db:push`, and run `npm run build`. The production start command is
+`npm run start`. Because the current database provider is SQLite, the host must
+provide persistent storage for the configured database file.
 
-```js
-const SHEET_ID = '';          // the Google Sheet ID (from its URL)
-const SHEET_NAME = 'Waitlist';
-const SECRET = '';            // same value as WAITLIST_SECRET
-const NOTIFY_EMAIL = '';      // inbox that receives instant notifications
+## Project structure
 
-function doPost(e) {
-  const lock = LockService.getScriptLock();
-  lock.wait(20000);
-  try {
-    const data = JSON.parse(e.postData.contents);
-    if (data.secret !== SECRET) {
-      return ContentService.createTextOutput(JSON.stringify({ status: 'forbidden' }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-    const ss = SpreadsheetApp.openById(SHEET_ID);
-    let sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
-    if (sh.getLastRow() === 0) {
-      sh.appendRow(['Timestamp', 'Name', 'Email', 'Role', 'Role (other)', 'Page URL', 'UTM']);
-    }
-    sh.appendRow([
-      new Date(), data.name, data.email, data.role,
-      data.roleOther || '', data.pageUrl || '', data.utm || ''
-    ]);
-    if (NOTIFY_EMAIL) {
-      MailApp.sendEmail(
-        NOTIFY_EMAIL,
-        'New OmniEye beta signup: ' + data.email,
-        data.name + ' (' + data.role + ') just joined the waitlist.\n\nPage: ' + (data.pageUrl || '')
-      );
-    }
-    return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'error' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
-  }
-}
-```
-
-Setup (three steps):
-
-1. Create the Google Sheet, copy its ID from the URL.
-2. Extensions → Apps Script → paste the script (fill `SHEET_ID`, `SECRET`,
-   `NOTIFY_EMAIL`) → Deploy → New deployment → type **Web app** → execute as
-   **Me**, access **Anyone** → copy the web-app URL.
-3. On the host (Vercel/Netlify/Cloudflare), set `WAITLIST_WEBHOOK_URL` to that
-   URL, plus `WAITLIST_SECRET` and `NOTIFY_EMAIL`. Redeploy.
-
-If the webhook is misconfigured or unreachable, submissions are still stored
-in SQLite (`DATABASE_URL`) — the lead is never lost, and the UI always shows a
-retry path. Duplicate emails are answered with a friendly "already on the
-list" message. A honeypot field plus basic per-IP rate limiting are included;
-no CAPTCHA at this stage. (Fallback option if the client prefers a managed
-service: Formspree or Web3Forms — swap the fetch in
-`src/components/omnieye/waitlist-form.tsx`.)
-
-## Deploy
-
-- **Vercel (recommended):** import the repo, add the env vars above, deploy.
-  API routes work out of the box.
-- **Netlify / Cloudflare Pages:** use the Next.js adapter (Netlify plugin /
-  `@opennextjs/cloudflare`).
-- Connect `getomnieye.com` or `omnieye.app` when DNS access is available;
-  HTTPS and www→apex redirect are handled by the platform.
-- Before launch, set `NEXT_PUBLIC_SITE_URL` to the final domain so canonical
-  URLs, sitemap and OG previews resolve.
-
-## Assets
-
-- `public/og.png` — 1200×630 Open Graph image (dark sheet, logo, headline, SAS
-  tagline, blue-gold glow).
-- `src/app/icon.svg` + `src/app/apple-icon.png` — favicon and touch icon from
-  the line-art eye mark.
-- Regenerate both after brand tweaks: `node scripts/generate-assets.mjs`
-  (requires the Instrument Serif / JetBrains Mono fonts to be installed for
-  the OG render; falls back to system serif otherwise).
-
-## Production notes & open client questions
-
-- Hotkey shown as **Alt + Space** per the mockups; final hotkey awaits client
-  confirmation (Windows reserves Alt+Space for the window menu).
-- The hero footnote clarifies that sub-300ms refers to screen-region capture.
-- Product UI is rebuilt live in HTML/SVG (no AI-rendered mockups on the page);
-  concept visuals are tagged "Product concept". The healthcare visual carries
-  the caption "Illustrative concept. OmniEye is not a medical device." and no
-  compliance badges appear anywhere.
-- Product is badged "Private Beta"; the AI vendor is never named; the
-  trademark line is in the footer.
-- Privacy Policy at `/privacy` is a plain-language draft marked for the
-  client's legal review; contact addresses (`privacy@getomnieye.com`,
-  `hello@getomnieye.com`) are placeholders pending the client's inboxes.
-
-## Ownership
-
-Full source is in this repository and transfers to the client. Phase 2 routes
-(`/download`, `/login`, `/docs`, `/faq`, `/pricing`) can be added without a
-rebuild — the layout is componentized under `src/components/omnieye`.
+- `src/app/` — routes, metadata, styles, and the waitlist API.
+- `src/components/omnieye/` — landing page and privacy-page components.
+- `src/components/ui/` — shared dialog component.
+- `src/lib/` — Prisma client and shared utilities.
+- `prisma/` — database schema.
+- `public/` — brand, mockup, social-preview, and demo-video assets.
+- Root configuration files — Next.js, TypeScript, PostCSS, and ESLint
+  settings.

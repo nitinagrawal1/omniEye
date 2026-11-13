@@ -39,8 +39,8 @@ export function HowItWorks() {
   // which step is centred in the viewport; step 2 also auto-plays the
   // lasso demo once (subscription callbacks, not effect bodies)
   const refs = [
-    useInView<HTMLDivElement>({ ...center, onEnter: () => setStep(1) }),
-    useInView<HTMLDivElement>({
+    useInView<HTMLLIElement>({ ...center, onEnter: () => setStep(1) }),
+    useInView<HTMLLIElement>({
       ...center,
       onEnter: () => {
         setStep(2);
@@ -49,7 +49,7 @@ export function HowItWorks() {
         }
       },
     }),
-    useInView<HTMLDivElement>({ ...center, onEnter: () => setStep(3) }),
+    useInView<HTMLLIElement>({ ...center, onEnter: () => setStep(3) }),
   ];
 
   const box = step >= 2;

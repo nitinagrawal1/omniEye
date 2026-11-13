@@ -1,54 +1,52 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Dependencies
+/node_modules/
 
-# dependencies
-node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Environment files
+.env*
+!.env.example
 
-# testing
-/coverage
-
-# next.js
+# Build output
 /.next/
 /out/
+/build/
+/dist/
+/coverage/
+/.turbo/
+/next-env.d.ts
 
-# production
-/build
+# Deployment and tooling output
+/.vercel/
+/.cursor/
+/.cursorrules
+/.claude/
+/.clinerules
+/.cline/
+/.windsurf/
+/.continue/
+/.aider*
+/.bolt/
+/.lovable/
+/.v0/
+/.manus/
+/.z-ai-config
+/.vscode/
+/.idea/
+/AGENTS.md
+/CLAUDE.md
+/.github/copilot-instructions.md
+/prompts/
+/specs/
+/plan/
+/notes/
+/scratch/
+*.prompt
 
-# misc
+# Logs and local files
+*.log
+*.pid
+*.db
+*.sqlite
+*.sqlite3
+*.tsbuildinfo
 .DS_Store
 *.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-local-*
-.claude
-.z-ai-config
-*.log
-dev.log
-dev.out.log
-test
-prompt
-
-server.log
-# Skills directory
-/skills/
