@@ -1,5 +1,8 @@
+"use client";
+
 import { CropCorners } from "./chrome";
 import { WaitlistForm } from "./waitlist-form";
+import { useLang } from "./lang";
 
 /**
  * Final CTA — the gold sheet. Full-bleed aureate, ink text, the page's
@@ -7,14 +10,16 @@ import { WaitlistForm } from "./waitlist-form";
  * block with underline inputs.
  */
 export function FinalCTA() {
+  const { c } = useLang();
+
   return (
     <section id="join" className="bg-aureate text-ink" aria-labelledby="join-heading">
       <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
         <div className="flex items-center gap-3">
           <span className="mono-label tnum">S-07</span>
-          <span className="mono-label text-ink/60">JOIN</span>
+          <span className="mono-label text-ink/60">{c.cta.sheetTag}</span>
           <span className="h-px flex-1 bg-ink/25" aria-hidden="true" />
-          <span className="mono-label text-ink/60 hidden sm:block">PRIVATE BETA · WINDOWS &amp; MACOS</span>
+          <span className="mono-label text-ink/60 hidden sm:block">{c.cta.sheetMeta}</span>
         </div>
 
         <div className="mt-10 max-w-3xl">
@@ -22,11 +27,10 @@ export function FinalCTA() {
             id="join-heading"
             className="font-serif text-[clamp(2.5rem,3.4vw+1rem,4.75rem)] leading-[1.02]"
           >
-            Ready to Upgrade Your Desktop Workflow?
+            {c.cta.heading}
           </h2>
           <p className="mt-5 text-base leading-relaxed text-ink/75 md:text-lg">
-            Join our private beta list for early access to OmniEye for Windows
-            and macOS.
+            {c.cta.sub}
           </p>
         </div>
 

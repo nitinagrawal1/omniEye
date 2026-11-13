@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { CadView } from "./cad-view";
+import { useLang } from "./lang";
 
 function youtubeId(url: string): string | null {
   const m = url.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/);
@@ -13,7 +14,7 @@ function vimeoId(url: string): string | null {
   return m ? m[1] : null;
 }
 /** Jumpshare share links embed through jumpshare.com/embed/<id>. */
-function jumpshareEmbed(url: string): string | null {
+export function jumpshareEmbed(url: string): string | null {
   const m = url.match(/jumpshare\.com\/(?:share\/|embed\/|v\/)?([A-Za-z0-9]{14,})/);
   return m ? `https://jumpshare.com/embed/${m[1]}` : null;
 }
@@ -42,6 +43,8 @@ export function VideoModal({
     else if (/\.(mp4|webm|mov)(\?.*)?$/i.test(demoVideoUrl)) embed = { kind: "video", src: demoVideoUrl };
   }
 
+  const { c } = useLang();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -50,11 +53,11 @@ export function VideoModal({
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-rule bg-ink px-4 py-3 md:px-5">
           <DialogTitle className="mono-label text-bone/90 font-normal tracking-[0.18em] uppercase">
-            Demo · 00:00 / 00:15
+            {c.modal.title}
           </DialogTitle>
           <DialogClose
             className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center border border-rule text-bone/80 transition-colors hover:border-aureate hover:text-aureate"
-            aria-label="Close demo video"
+            aria-label={c.modal.close}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M2 2 L12 12 M12 2 L2 12" stroke="currentColor" strokeWidth="1.5" />
@@ -62,7 +65,7 @@ export function VideoModal({
           </DialogClose>
         </div>
         <DialogDescription className="sr-only">
-          OmniEye product demo video.
+          {c.modal.desc}
         </DialogDescription>
 
         {embed ? (
@@ -70,20 +73,20 @@ export function VideoModal({
             <div className="aspect-video w-full bg-midnight">
               {embed.kind === "iframe" ? (
                 <iframe
-                  src={embed.src}
+                  src={`${embed.src}?autoplay=1`}
                   title="OmniEye product demo"
                   className="h-full w-full"
                   allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen; autoplay"
                   allowFullScreen
                 />
               ) : (
-                <video src={embed.src} controls preload="none" className="h-full w-full" />
+                <video src={embed.src} controls autoPlay muted playsInline preload="metadata" className="h-full w-full" />
               )}
             </div>
             {/* fallback for strict browsers / extensions that block third-party players */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-4 py-3 md:px-5">
               <span className="mono-label text-graphite">
-                PLAYER BLOCKED?{" "}
+                {c.modal.blocked}{" "}
                 <a
                   href={demoVideoUrl?.includes("jumpshare.com")
                     ? `https://jumpshare.com/share/${demoVideoUrl.split("/").pop()}`
@@ -92,22 +95,22 @@ export function VideoModal({
                   rel="noopener noreferrer"
                   className="text-bone/90 underline decoration-rule underline-offset-4 transition-colors hover:text-aureate"
                 >
-                  Watch on the host site ↗
+                  {c.modal.hostLink}
                 </a>
               </span>
-              <span className="mono-label text-graphite">15 SECONDS · NO AUTOPLAY</span>
+              <span className="mono-label text-graphite">{c.modal.duration}</span>
             </div>
             {/* production reference: the full 60-second walkthrough plan */}
             <figure className="border-t border-rule px-4 py-5 md:px-5">
               <figcaption className="flex flex-wrap items-center justify-between gap-2">
-                <span className="mono-label text-aureate">FIG · SB-01</span>
+                <span className="mono-label text-aureate">{c.modal.figTag}</span>
                 <span className="mono-label text-graphite">
-                  FULL 60-SECOND WALKTHROUGH · PRODUCTION REFERENCE
+                  {c.modal.figMeta}
                 </span>
               </figcaption>
               <Image
                 src="/mockups/storyboard-1100.webp"
-                alt="Four-panel storyboard of the OmniEye demo: opening AutoCAD and a PDF side by side, activating the overlay with Alt plus Space, lassoing a beam schedule, and the extracted beam information answer"
+                alt={c.modal.storyboardAlt}
                 width={1100}
                 height={733}
                 sizes="(min-width: 640px) 896px, 100vw"
@@ -119,20 +122,19 @@ export function VideoModal({
           <div className="relative">
             <CadView className="aspect-video w-full" />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink/72 px-6 text-center">
-              <span className="mono-label text-graphite">S-DEMO · PENDING DELIVERY</span>
+              <span className="mono-label text-graphite">{c.modal.pendingTag}</span>
               <p className="font-serif text-2xl text-bone md:text-3xl">
-                Demo video coming soon
+                {c.modal.pendingTitle}
               </p>
               <p className="max-w-sm text-sm text-graphite">
-                The 60-second walkthrough is in production. Join the beta list and
-                we&apos;ll send it to you first.
+                {c.modal.pendingBody}
               </p>
               <DialogClose asChild>
                 <a
                   href="#join"
                   className="inline-flex min-h-[44px] items-center bg-aureate px-5 py-2 mono-label text-ink transition-transform hover:-translate-y-px"
                 >
-                  Join the waitlist
+                  {c.modal.join}
                 </a>
               </DialogClose>
             </div>

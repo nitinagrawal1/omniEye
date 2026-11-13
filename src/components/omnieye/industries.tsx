@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { CropCorners } from "./chrome";
 import { CaptureChip } from "./hud";
+import { useLang } from "./lang";
 
 /**
  * Industries — three huge serif index rows that expand on hover, focus or
@@ -11,43 +12,26 @@ import { CaptureChip } from "./hud";
  */
 export function Industries() {
   const [active, setActive] = useState<number>(0);
+  const { c } = useLang();
 
-  const rows = [
-    {
-      n: "01",
-      title: "Education & Research",
-      body: "Students, educators, and researchers can instantly highlight complex formulas, textbook diagrams, or dense academic papers to get clear explanations and summaries in real time.",
-      visual: <EducationVisual />,
-    },
-    {
-      n: "02",
-      title: "Healthcare & Diagnostics",
-      body: "Medical professionals and analysts can quickly cross-reference clinical reports, lab tables, and patient records with privacy-first controls that keep sensitive data protected.",
-      visual: <HealthcareVisual />,
-    },
-    {
-      n: "03",
-      title: "IT & Software Engineering",
-      body: "Developers and tech teams can lasso error logs, code blocks, or system architectures right inside their IDE to debug and build faster without breaking focus.",
-      visual: <ItVisual />,
-    },
-  ];
+  const visuals = [<EducationVisual key="e" />, <HealthcareVisual key="h" />, <ItVisual key="i" />];
+  const rows = c.industries.rows.map((row, i) => ({ ...row, visual: visuals[i] }));
 
   return (
     <section id="industries" className="bg-ink" aria-labelledby="industries-heading">
       <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
         <div className="flex items-center gap-3">
           <span className="mono-label tnum text-aureate">S-06</span>
-          <span className="mono-label text-graphite">SHOW</span>
+          <span className="mono-label text-graphite">{c.industries.sheetTag}</span>
           <span className="h-px flex-1 bg-rule" aria-hidden="true" />
-          <span className="mono-label text-graphite hidden sm:block">INDEX LIST · HOVER OR TAP TO EXPAND</span>
+          <span className="mono-label text-graphite hidden sm:block">{c.industries.sheetMeta}</span>
         </div>
 
         <h2
           id="industries-heading"
           className="mt-8 font-serif text-[clamp(2.5rem,3.4vw+1rem,4.75rem)] leading-[1.02] text-bone"
         >
-          Transforming Every Industry
+          {c.industries.heading}
         </h2>
 
         <div className="mt-12 border-t border-rule">
@@ -63,7 +47,7 @@ export function Industries() {
                   onClick={() => setActive(i)}
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
-                  className="group flex w-full items-center justify-between gap-6 py-7 text-left md:py-9"
+                  className="group flex w-full items-center justify-between gap-6 py-7 text-start md:py-9"
                 >
                   <span className="flex min-w-0 items-baseline gap-4 md:gap-8">
                     <span
@@ -122,9 +106,10 @@ export function Industries() {
 /* ── visuals: the client's real product captures, toned toward the palette ── */
 
 function ConceptTag() {
+  const { c } = useLang();
   return (
     <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-      Product concept
+      {c.about.figTag}
     </span>
   );
 }
@@ -160,11 +145,12 @@ function VisualFrame({
 }
 
 function EducationVisual() {
+  const { c } = useLang();
   return (
     <VisualFrame label="FIG · E-01">
       <div className="flex aspect-[16/10] flex-col justify-between p-5">
         <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-          TEXTBOOK · CH. 04 — GEOMETRY
+          {c.industries.textbookLabel}
         </span>
         <div className="flex items-center justify-between gap-4">
           <span className="font-serif text-3xl text-bone/90 md:text-4xl">
@@ -177,23 +163,24 @@ function EducationVisual() {
             <rect x="34" y="30" width="60" height="44" transform="rotate(90 34 30)" stroke="rgba(77,124,255,0.6)" strokeDasharray="4 3" strokeWidth="1" fill="none" />
           </svg>
         </div>
-        <CaptureChip label="Summary ready · 240ms" className="self-start" />
+        <CaptureChip label={c.industries.summaryChip} className="self-start" />
       </div>
     </VisualFrame>
   );
 }
 
 function HealthcareVisual() {
+  const { c } = useLang();
   return (
     <VisualFrame
       label="FIG · H-01"
-      caption="Illustrative concept. OmniEye is not a medical device."
+      caption={c.industries.clinicalCaption}
     >
       <div className="relative aspect-[16/10]">
         {/* the client's patient-lab capture (HIPAA chip removed) */}
         <Image
           src="/mockups/healthcare-1208.webp"
-          alt="OmniEye overlay on a patient lab report, with extracted clinical insights: HbA1c, creatinine and cholesterol values correlated with a chest CT impression"
+          alt={c.industries.healthcareAlt}
           fill
           sizes="(min-width: 768px) 520px, 100vw"
           className="object-cover"
@@ -207,10 +194,10 @@ function HealthcareVisual() {
           style={{ fontSize: "10px" }}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-sapphire" aria-hidden="true" />
-          Extracted Clinical Insights
+          {c.industries.clinicalChip}
         </span>
         <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-          Privacy-first
+          {c.industries.privacyFirst}
         </span>
       </div>
     </VisualFrame>
@@ -218,13 +205,14 @@ function HealthcareVisual() {
 }
 
 function ItVisual() {
+  const { c } = useLang();
   return (
     <VisualFrame label="FIG · IT-01">
       <div className="relative aspect-[10/11]">
         {/* the client's IDE capture — OmniEye HUD over the code editor */}
         <Image
           src="/mockups/it-code-542.webp"
-          alt="OmniEye HUD over a code editor, reporting that code structure analysis is complete with three warnings identified in server logs"
+          alt={c.industries.itAlt}
           fill
           sizes="(min-width: 768px) 520px, 100vw"
           className="object-cover"
@@ -237,10 +225,10 @@ function ItVisual() {
           style={{ fontSize: "10px" }}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-sapphire" aria-hidden="true" />
-          Code structure analysis · inside your IDE
+          {c.industries.codeChip}
         </span>
         <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-          No context switch
+          {c.industries.noSwitch}
         </span>
       </div>
     </VisualFrame>

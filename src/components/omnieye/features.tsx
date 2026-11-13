@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useLang } from "./lang";
 
-type App = { id: string; name: string; tile: string; note: string; visible: boolean; locked: boolean };
+type App = { id: string; tile: string; note: "hidden" | "locked" | "visible" | "blind"; visible: boolean; locked: boolean };
 
 const INITIAL_APPS: App[] = [
-  { id: "autocad", name: "AutoCAD 2026", tile: "AUTOCAD", note: "Visible", visible: true, locked: false },
-  { id: "acrobat", name: "Adobe Acrobat PDF", tile: "ACROBAT", note: "Visible", visible: true, locked: false },
-  { id: "chrome", name: "Google Chrome", tile: "CHROME", note: "Visible", visible: true, locked: false },
-  { id: "bank", name: "Banking & Finance App", tile: "BANKING", note: "Hidden by Default", visible: false, locked: true },
-  { id: "messages", name: "Personal Messages", tile: "MESSAGES", note: "Locked", visible: false, locked: true },
+  { id: "autocad", tile: "AUTOCAD", note: "visible", visible: true, locked: false },
+  { id: "acrobat", tile: "ACROBAT", note: "visible", visible: true, locked: false },
+  { id: "chrome", tile: "CHROME", note: "visible", visible: true, locked: false },
+  { id: "bank", tile: "BANKING", note: "hidden", visible: false, locked: true },
+  { id: "messages", tile: "MESSAGES", note: "locked", visible: false, locked: true },
 ];
 
 const TILES: Record<string, React.CSSProperties> = {
@@ -20,57 +21,40 @@ const TILES: Record<string, React.CSSProperties> = {
   messages: { left: "34%", top: "68%", width: "26%", height: "24%" },
 };
 
-const SPEC_ROWS = [
-  {
-    numeral: "<300ms",
-    label: "Ultra-Low Latency",
-    body: "Engineered for instant capture and context stitching so you stay in flow.",
-  },
-  {
-    numeral: "<2% CPU",
-    label: "Featherlight Footprint",
-    body: "Runs smoothly in the background alongside heavy desktop applications without slowing down your machine.",
-  },
-  {
-    numeral: "Hidden by default",
-    label: "Privacy-First Whitelisting",
-    body: "You control which apps OmniEye can see. Sensitive windows stay completely invisible by default.",
-  },
-];
-
 export function Features() {
+  const { c } = useLang();
   const [apps, setApps] = useState<App[]>(INITIAL_APPS);
 
   const toggle = (id: string) => {
     setApps((prev) =>
-      prev.map((a) => (a.id === id && !a.locked ? { ...a, visible: !a.visible, note: !a.visible ? "Visible" : "Blind" } : a))
+      prev.map((a) => (a.id === id && !a.locked ? { ...a, visible: !a.visible, note: !a.visible ? "visible" : "blind" } : a))
     );
   };
 
   const blindCount = apps.filter((a) => !a.visible).length;
-  const status = `${blindCount} of ${apps.length} windows blind · sensitive windows remain invisible`;
+  const status = c.features.statusAria.replace("{n}", String(blindCount)).replace("{total}", String(apps.length));
 
   return (
     <section id="features" className="bg-midnight" aria-labelledby="features-heading">
       <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
         <div className="flex items-center gap-3">
           <span className="mono-label tnum text-aureate">S-04</span>
-          <span className="mono-label text-graphite">ANALYZE</span>
+          <span className="mono-label text-graphite">{c.features.sheetTag}</span>
           <span className="h-px flex-1 bg-rule" aria-hidden="true" />
-          <span className="mono-label text-graphite hidden sm:block">SPEC SHEET</span>
+          <span className="mono-label text-graphite hidden sm:block">{c.features.sheetMeta}</span>
         </div>
 
         <h2
           id="features-heading"
           className="mt-8 font-serif text-[clamp(2.5rem,3.4vw+1rem,4.75rem)] leading-[1.02] text-bone"
         >
-          Built for Speed &amp; Privacy
+          {c.features.heading}
         </h2>
 
         <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-14">
           {/* spec sheet */}
           <div className="border-t border-rule">
-            {SPEC_ROWS.map((row, i) => (
+            {c.features.specs.map((row, i) => (
               <div
                 key={row.label}
                 className="grid gap-2 border-b border-rule py-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] sm:gap-8 sm:py-10"
@@ -97,8 +81,8 @@ export function Features() {
           {/* live privacy panel */}
           <div className="border border-rule bg-ink/60">
             <div className="flex items-center justify-between border-b border-rule px-5 py-3.5">
-              <span className="mono-label text-bone/90">Privacy &amp; App Whitelisting</span>
-              <span className="mono-label text-graphite">Product concept</span>
+              <span className="mono-label text-bone/90">{c.features.panelTitle}</span>
+              <span className="mono-label text-graphite">{c.features.panelMeta}</span>
             </div>
 
             {/* mini desktop */}
@@ -126,7 +110,7 @@ export function Features() {
                       </span>
                       {blind ? (
                         <span className="mono-label text-ember" style={{ fontSize: "9px" }}>
-                          Blind
+                          {c.features.blind}
                         </span>
                       ) : null}
                     </div>
@@ -155,21 +139,21 @@ export function Features() {
               {apps.map((app) => (
                 <li key={app.id} className="flex items-center justify-between gap-3 px-5 py-3">
                   <span className="min-w-0">
-                    <span className="block truncate text-sm text-bone/90">{app.name}</span>
+                    <span className="block truncate text-sm text-bone/90">{c.features.apps[app.id]}</span>
                     <span
                       className={`mono-label ${app.visible ? "text-graphite" : "text-ember"}`}
                       style={{ fontSize: "10px" }}
                     >
-                      {app.visible ? "On · Visible" : `Off · ${app.note}`}
+                      {app.visible ? c.features.on : c.features.off.replace("{note}", c.features.notes[app.note])}
                     </span>
                   </span>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={app.visible}
-                    aria-label={`${app.name} — ${app.visible ? "visible to OmniEye" : "hidden from OmniEye"}`}
+                    aria-label={`${c.features.apps[app.id]} — ${app.visible ? c.features.toggleAriaVisible : c.features.toggleAriaHidden}`}
                     disabled={app.locked}
-                    title={app.locked ? "Sensitive apps are hidden by default and cannot be enabled" : undefined}
+                    title={app.locked ? c.features.sensitiveTitle : undefined}
                     onClick={() => toggle(app.id)}
                     className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center ${
                       app.locked ? "cursor-not-allowed opacity-60" : ""
@@ -192,7 +176,7 @@ export function Features() {
             </ul>
 
             <p className="border-t border-rule px-5 py-3.5 mono-label text-graphite">
-              Privacy-First Engine: Sensitive windows remain invisible • &lt;2% CPU
+              {c.features.panelFoot}
             </p>
           </div>
         </div>

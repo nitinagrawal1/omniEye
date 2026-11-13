@@ -4,24 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CadView } from "./cad-view";
 import { CaptureChip, HotkeyPill, HudCard } from "./hud";
 import { useInView, useMediaQuery } from "./hooks";
-
-const STEPS = [
-  {
-    n: "01",
-    title: "Trigger Anywhere.",
-    body: "Press a single global hotkey to summon the translucent OmniEye overlay over any active software—from AutoCAD and PDFs to browsers and spreadsheets.",
-  },
-  {
-    n: "02",
-    title: "Lasso Your Context.",
-    body: "Drag a quick selection around any diagram, table, code block, or text. Our sub-300ms OCR and vision engine captures and stitches the exact visual context.",
-  },
-  {
-    n: "03",
-    title: "Act Instantly.",
-    body: "Ask a question, extract data, or run a custom prompt right inside the floating HUD without ever leaving your workspace.",
-  },
-];
+import { useLang } from "./lang";
 
 /**
  * How OmniEye Works — scrollytelling: one sticky CAD stage that changes as
@@ -29,6 +12,7 @@ const STEPS = [
  * in SVG and runs once when step 02 enters view, with a Replay control.
  */
 export function HowItWorks() {
+  const { c } = useLang();
   const [step, setStep] = useState(1);
   const [playing, setPlaying] = useState(false);
   const [playKey, setPlayKey] = useState(0);
@@ -78,16 +62,16 @@ export function HowItWorks() {
       <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
         <div className="flex items-center gap-3">
           <span className="mono-label tnum text-aureate">S-03</span>
-          <span className="mono-label text-graphite">ANALYZE</span>
+          <span className="mono-label text-graphite">{c.how.sheetTag}</span>
           <span className="h-px flex-1 bg-rule" aria-hidden="true" />
-          <span className="mono-label text-graphite hidden sm:block">STICKY STAGE · LIVE REBUILD</span>
+          <span className="mono-label text-graphite hidden sm:block">{c.how.sheetMeta}</span>
         </div>
 
         <h2
           id="how-heading"
           className="mt-8 font-serif text-[clamp(2.5rem,3.4vw+1rem,4.75rem)] leading-[1.02] text-bone"
         >
-          How OmniEye Works
+          {c.how.heading}
         </h2>
 
         <div className="mt-12 lg:grid lg:grid-cols-[46%_minmax(0,1fr)] lg:gap-12">
@@ -132,10 +116,7 @@ export function HowItWorks() {
               >
                 {step === 3 ? (
                   <HudCard
-                    rows={[
-                      { k: "Area", v: "42.5 sqm" },
-                      { k: "Material", v: "Type B Concrete" },
-                    ]}
+                    rows={c.how.hudRows}
                     source="BEAM B-2 · 250 × 500 MM"
                   />
                 ) : null}
@@ -145,7 +126,7 @@ export function HowItWorks() {
             </div>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
               <p className="mono-label text-graphite">
-                PRODUCT CONCEPT · STAGE BUILT LIVE IN SVG — NO SCREEN RECORDINGS
+                {c.how.stageCaption}
               </p>
               {canReplay && played && !reducedMotion ? (
                 <button
@@ -153,7 +134,7 @@ export function HowItWorks() {
                   onClick={runLasso}
                   className="border border-rule bg-ink/80 px-3 py-2 mono-label text-bone/90 transition-colors hover:border-aureate hover:text-aureate"
                 >
-                  ↺ Replay
+                  {c.how.replay}
                 </button>
               ) : null}
             </div>
@@ -161,7 +142,7 @@ export function HowItWorks() {
 
           {/* the three steps */}
           <ol className="space-y-6 lg:space-y-0">
-            {STEPS.map((s, i) => (
+            {c.how.steps.map((s, i) => (
               <li
                 key={s.n}
                 ref={refs[i].ref}

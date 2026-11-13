@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif, JetBrains_Mono, Amiri, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,6 +22,18 @@ const instrumentSerif = Instrument_Serif({
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+});
+
+// Arabic (Dubai market): Amiri for display headlines, Noto Sans Arabic for body
+const amiri = Amiri({
+  variable: "--font-arabic-serif",
+  subsets: ["arabic"],
+  weight: ["400", "700"],
+});
+
+const notoSansArabic = Noto_Sans_Arabic({
+  variable: "--font-arabic-sans",
+  subsets: ["arabic"],
 });
 
 export const SITE_URL =
@@ -97,7 +109,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} antialiased bg-ink text-bone`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} ${amiri.variable} ${notoSansArabic.variable} antialiased bg-ink text-bone`}
       >
         <a
           href="#main"

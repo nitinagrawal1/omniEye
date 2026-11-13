@@ -366,3 +366,43 @@
 .lasso-play .lasso-hud {
   animation: lasso-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 2.15s both;
 }
+
+/* ── Arabic (Dubai market) — RTL typography ────────────────────
+   Arabic script must not be letter-spaced, uppercase-transformed
+   or italicized; headline serif maps to Amiri, body to Noto Sans
+   Arabic. Unlayered rules intentionally override Tailwind layers. */
+html[dir="rtl"] body {
+  font-family: var(--font-arabic-sans), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+html[dir="rtl"] .font-serif,
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] .drop-cap::first-letter {
+  font-family: var(--font-arabic-serif), var(--font-arabic-sans), serif;
+}
+
+html[dir="rtl"] body,
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] .mono-label {
+  letter-spacing: normal;
+}
+
+html[dir="rtl"] .mono-label {
+  text-transform: none;
+}
+
+html[dir="rtl"] h1 em,
+html[dir="rtl"] h2 em,
+html[dir="rtl"] .drop-cap::first-letter {
+  font-style: normal;
+}
+
+html[dir="rtl"] .drop-cap::first-letter {
+  float: right;
+  padding-right: 0;
+  padding-left: 0.12em;
+}

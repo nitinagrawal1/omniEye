@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { LogoLockup } from "./eye-mark";
-
-const NAV = [
-  { sheet: "S-03", label: "How it works", href: "#how-it-works" },
-  { sheet: "S-04", label: "Features", href: "#features" },
-  { sheet: "S-06", label: "Industries", href: "#industries" },
-  { sheet: "S-05", label: "About", href: "#about" },
-];
+import { LanguageToggle, useLang } from "./lang";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { c } = useLang();
+
+  const NAV = [
+    { sheet: "S-03", label: c.nav.how, href: "#how-it-works" },
+    { sheet: "S-04", label: c.nav.features, href: "#features" },
+    { sheet: "S-06", label: c.nav.industries, href: "#industries" },
+    { sheet: "S-05", label: c.nav.about, href: "#about" },
+  ];
 
   // Close the mobile sheet whenever the hash changes (anchor navigation).
   useEffect(() => {
@@ -27,7 +29,7 @@ export function SiteHeader() {
           <LogoLockup />
         </a>
 
-        <nav aria-label="Sections" className="hidden lg:flex items-center gap-7">
+        <nav aria-label={c.nav.sectionsAria} className="hidden lg:flex items-center gap-7">
           {NAV.map((item) => (
             <a
               key={item.href}
@@ -40,12 +42,13 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <LanguageToggle />
           <a
             href="#join"
             className="hidden sm:inline-flex min-h-[44px] items-center bg-aureate px-5 py-2 mono-label text-ink transition-transform hover:-translate-y-px hover:brightness-105"
           >
-            Join Early Access
+            {c.nav.cta}
           </a>
           <button
             type="button"
@@ -53,7 +56,7 @@ export function SiteHeader() {
             aria-expanded={open}
             aria-controls="mobile-nav"
             className="lg:hidden inline-flex min-h-[44px] min-w-[44px] items-center justify-center border border-rule text-bone"
-            aria-label={open ? "Close section index" : "Open section index"}
+            aria-label={open ? c.nav.closeIndex : c.nav.openIndex}
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
               {open ? (
@@ -69,7 +72,7 @@ export function SiteHeader() {
       {open ? (
         <nav
           id="mobile-nav"
-          aria-label="Sections"
+          aria-label={c.nav.sectionsAria}
           className="lg:hidden border-t border-rule bg-ink/95 backdrop-blur-md px-5 py-3"
         >
           {NAV.map((item) => (
@@ -86,7 +89,7 @@ export function SiteHeader() {
             href="#join"
             className="mt-3 mb-2 flex min-h-[48px] items-center justify-center bg-aureate px-5 mono-label text-ink"
           >
-            Join Early Access
+            {c.nav.cta}
           </a>
         </nav>
       ) : null}

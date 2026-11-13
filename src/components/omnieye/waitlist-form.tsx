@@ -2,16 +2,8 @@
 
 import { useRef, useState } from "react";
 
-const ROLES = [
-  "Engineering / CAD",
-  "Finance / Analytics",
-  "Healthcare",
-  "Education / Research",
-  "IT / Software",
-  "Legal",
-  "Operations",
-  "Other",
-];
+import { COPY, type Lang } from "./copy";
+import { useLang } from "./lang";
 
 type Status = "idle" | "submitting" | "success" | "duplicate" | "error";
 type FieldErrors = { name?: string; email?: string; role?: string };
@@ -19,6 +11,7 @@ type FieldErrors = { name?: string; email?: string; role?: string };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function WaitlistForm() {
+  const { c, lang } = useLang();
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [showOther, setShowOther] = useState(false);
@@ -27,13 +20,17 @@ export function WaitlistForm() {
   const emailRef = useRef<HTMLInputElement>(null);
   const roleRef = useRef<HTMLSelectElement>(null);
 
+  // stable option values come from the English deck; labels are localized
+  const roleValues = COPY.en.form.roles;
+  const roleLabels: Record<Lang, string[]> = { en: roleValues, ar: COPY.ar.form.roles };
+
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
-    if (!nameRef.current?.value.trim()) next.name = "Please add your name.";
+    if (!nameRef.current?.value.trim()) next.name = c.form.errName;
     const email = emailRef.current?.value.trim() ?? "";
-    if (!email) next.email = "Please add your work email.";
-    else if (!EMAIL_RE.test(email)) next.email = "That email doesn't look right—check it once more.";
-    if (!roleRef.current?.value) next.role = "Choose the closest match.";
+    if (!email) next.email = c.form.errEmail;
+    else if (!EMAIL_RE.test(email)) next.email = c.form.errEmailFormat;
+    if (!roleRef.current?.value) next.role = c.form.errRole;
     return next;
   };
 
@@ -87,21 +84,19 @@ export function WaitlistForm() {
         role="status"
         aria-live="polite"
       >
-        <p className="mono-label text-ink/70">S-07 · SUBMISSION LOGGED</p>
+        <p className="mono-label text-ink/70">{c.form.successTag}</p>
         <p className="mt-3 font-serif text-2xl leading-snug text-ink md:text-3xl">
-          You&apos;re on the list. We&apos;ll email you when your beta invite is
-          ready.
+          {c.form.successTitle}
         </p>
         <p className="mt-4 text-sm text-ink/70">
-          Keep an eye on your inbox—beta invitations and product updates go out
-          from this address only.
+          {c.form.successBody}
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate aria-label="Beta waitlist">
+    <form onSubmit={onSubmit} noValidate aria-label={c.form.aria}>
       {/* honeypot — invisible to humans */}
       <div className="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
         <label htmlFor="company">Company</label>
@@ -111,7 +106,7 @@ export function WaitlistForm() {
       <div className="grid gap-8 md:grid-cols-3 md:gap-6">
         <div>
           <label htmlFor="wl-name" className="mono-label block text-ink/70">
-            Name *
+            {c.form.name}
           </label>
           <input
             id="wl-name"
@@ -133,7 +128,7 @@ export function WaitlistForm() {
 
         <div>
           <label htmlFor="wl-email" className="mono-label block text-ink/70">
-            Work Email *
+            {c.form.email}
           </label>
           <input
             id="wl-email"
@@ -144,7 +139,7 @@ export function WaitlistForm() {
             autoComplete="email"
             spellCheck={false}
             required
-            placeholder="you@company.com…"
+            placeholder={c.form.emailPlaceholder}
             className="sheet-input mt-2"
             aria-invalid={errors.email ? "true" : undefined}
             aria-describedby={errors.email ? "wl-email-err" : undefined}
@@ -158,7 +153,7 @@ export function WaitlistForm() {
 
         <div>
           <label htmlFor="wl-role" className="mono-label block text-ink/70">
-            Role / Use-case *
+            {c.form.role}
           </label>
           <div className="relative mt-2">
             <select
@@ -173,11 +168,11 @@ export function WaitlistForm() {
               onChange={(e) => setShowOther(e.target.value === "Other")}
             >
               <option value="" disabled>
-                Select…
+                {c.form.select}
               </option>
-              {ROLES.map((r) => (
+              {roleValues.map((r, i) => (
                 <option key={r} value={r}>
-                  {r}
+                  {roleLabels[lang][i]}
                 </option>
               ))}
             </select>
@@ -202,8 +197,8 @@ export function WaitlistForm() {
               type="text"
               name="roleOther"
               autoComplete="off"
-              aria-label="Describe your role or use-case"
-              placeholder="Tell us briefly…"
+              aria-label={c.form.otherAria}
+              placeholder={c.form.otherPlaceholder}
               value={otherValue}
               onChange={(e) => setOtherValue(e.target.value)}
               maxLength={120}
@@ -225,13 +220,12 @@ export function WaitlistForm() {
               <path d="M8 1.5 A6.5 6.5 0 0 1 14.5 8" stroke="#EAE3D2" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           ) : null}
-          Get Early Access
+          {c.form.submit}
         </button>
 
         {status === "duplicate" ? (
           <p role="status" className="text-sm font-medium text-ink">
-            This email is already on the list—you&apos;re all set. No need to
-            submit twice.
+            {c.form.duplicate}
           </p>
         ) : null}
 
@@ -239,24 +233,24 @@ export function WaitlistForm() {
           <div role="alert" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-ink">
             <span className="inline-flex items-center gap-2">
               <span className="h-2.5 w-2.5 bg-ember" aria-hidden="true" />
-              Something went wrong on our side. Your details weren&apos;t lost—try again.
+              {c.form.error}
             </span>
             <button
               type="submit"
               className="min-h-[44px] border border-ink/60 px-4 py-2 mono-label text-ink hover:border-ink"
             >
-              Retry
+              {c.form.retry}
             </button>
             <a href="mailto:hello@getomnieye.com" className="min-h-[44px] inline-flex items-center underline underline-offset-4">
-              or email us
+              {c.form.orEmail}
             </a>
           </div>
         ) : null}
 
         <p className="text-sm text-ink/70">
-          By joining you agree to our{" "}
+          {c.form.agree}{" "}
           <a href="/privacy" className="underline underline-offset-4 hover:text-ink">
-            Privacy Policy
+            {c.form.privacyLink}
           </a>
           .
         </p>

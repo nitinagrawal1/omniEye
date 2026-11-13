@@ -1,8 +1,7 @@
 "use client";
 
 import { useInView } from "./hooks";
-
-const OLD_STEPS = ["COPY", "SWITCH TAB", "PASTE", "UPLOAD", "WAIT"];
+import { useLang } from "./lang";
 
 /**
  * Problem — the one light "paper" band on bone. The heading words are
@@ -10,15 +9,16 @@ const OLD_STEPS = ["COPY", "SWITCH TAB", "PASTE", "UPLOAD", "WAIT"];
  */
 export function Problem() {
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.35 });
+  const { c } = useLang();
 
   return (
     <section id="problem" className="bg-bone text-ink" aria-labelledby="problem-heading">
       <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
         <div className="flex items-center gap-3">
           <span className="mono-label tnum text-ember">S-02</span>
-          <span className="mono-label text-ink/60">PROBLEM</span>
+          <span className="mono-label text-ink/60">{c.problem.sheetTag}</span>
           <span className="h-px flex-1 bg-ink/25" aria-hidden="true" />
-          <span className="mono-label text-ink/60 hidden sm:block">THE OLD WAY</span>
+          <span className="mono-label text-ink/60 hidden sm:block">{c.problem.sheetMeta}</span>
         </div>
 
         <div ref={ref} className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-8">
@@ -26,34 +26,32 @@ export function Problem() {
             id="problem-heading"
             className="font-serif text-[clamp(2.5rem,4vw+1rem,5.25rem)] leading-[1.02] tracking-[-0.01em] lg:col-span-8"
           >
-            Stop{" "}
+            {c.problem.hA}
             <span className={`strike ${inView ? "is-struck" : ""}`} style={{ "--strike-delay": "150ms" } as React.CSSProperties}>
-              Copying
+              {c.problem.hS1}
             </span>
-            ,{" "}
+            {c.problem.hM1}
             <span className={`strike ${inView ? "is-struck" : ""}`} style={{ "--strike-delay": "650ms" } as React.CSSProperties}>
-              Pasting
+              {c.problem.hS2}
             </span>
-            , and{" "}
+            {c.problem.hM2}
             <span className={`strike ${inView ? "is-struck" : ""}`} style={{ "--strike-delay": "1150ms" } as React.CSSProperties}>
-              Uploading
-            </span>{" "}
-            Screenshots.
+              {c.problem.hS3}
+            </span>
+            {c.problem.hM3}
+            {c.problem.hEnd}
           </h2>
 
           <div className="lg:col-span-4 lg:col-start-9 lg:self-end">
             <p className="max-w-md text-base leading-relaxed text-ink/70 md:text-lg">
-              Modern knowledge workers—from engineers reviewing complex CAD
-              drawings to analysts reading dense reports—lose hours manually
-              feeding context into AI chatbots. Switching tabs breaks focus and
-              slows down execution.
+              {c.problem.body}
             </p>
           </div>
         </div>
 
         {/* the "before" strip collapsing into a single lasso gesture */}
         <div className="mt-14 flex flex-wrap items-center gap-x-3 gap-y-4 md:mt-20" aria-hidden="true">
-          {OLD_STEPS.map((step, i) => (
+          {c.problem.oldSteps.map((step, i) => (
             <span key={step} className="inline-flex items-center gap-3">
               <span className="border border-ink/30 px-3 py-1.5 mono-label text-ink/55 line-through decoration-ink/70 decoration-2 tnum">
                 {`0${i + 1} · ${step}`}
@@ -72,9 +70,9 @@ export function Problem() {
               <rect x="0" y="33" width="9" height="9" fill="#EAE3D2" stroke="#4D7CFF" strokeWidth="1.5" />
               <rect x="103" y="33" width="9" height="9" fill="#EAE3D2" stroke="#4D7CFF" strokeWidth="1.5" />
             </svg>
-            <span className="sr-only">One lasso gesture replaces every step above.</span>
+            <span className="sr-only">{c.problem.lassoSr}</span>
           </span>
-          <span className="mono-label text-ink/70">ONE GESTURE</span>
+          <span className="mono-label text-ink/70">{c.problem.oneGesture}</span>
         </div>
       </div>
     </section>

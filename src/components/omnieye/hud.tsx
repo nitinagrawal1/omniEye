@@ -2,31 +2,34 @@
 
 import { useState } from "react";
 import { EyeMark } from "./eye-mark";
+import { useLang } from "./lang";
 
 /** Mono chip announcing a completed capture. */
 export function CaptureChip({
-  label = "Lasso Context Capture · 240ms",
+  label,
   className = "",
 }: {
   label?: string;
   className?: string;
 }) {
+  const { c } = useLang();
   return (
     <span
       className={`lasso-chip inline-flex items-center gap-2 border border-sapphire/60 bg-ink/85 px-3 py-1.5 mono-label text-bone/90 capture-glow ${className}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-sapphire" aria-hidden="true" />
-      <span className="tnum">{label}</span>
+      <span className="tnum">{label ?? c.hud.captureChip}</span>
     </span>
   );
 }
 
 /** Global hotkey pill — Alt + Space, per the client mockups. */
 export function HotkeyPill({ className = "" }: { className?: string }) {
+  const { c } = useLang();
   return (
     <span
       className={`inline-flex flex-col items-center gap-2.5 ${className}`}
-      aria-label="Hotkey: Alt plus Space, OmniEye overlay activated"
+      aria-label={c.hud.hotkeyAria}
     >
       <span className="inline-flex items-center gap-2" aria-hidden="true">
         <kbd className="border border-rule bg-ink/85 px-3 py-1.5 font-mono text-sm text-bone shadow-[inset_0_-2px_0_rgba(234,227,210,0.14)]">
@@ -37,7 +40,7 @@ export function HotkeyPill({ className = "" }: { className?: string }) {
           Space
         </kbd>
       </span>
-      <span className="mono-label text-graphite">OmniEye Overlay Activated</span>
+      <span className="mono-label text-graphite">{c.hud.activated}</span>
     </span>
   );
 }
@@ -49,7 +52,7 @@ export type HudRow = { k: string; v: string };
  * supplied mockups). Copy button copies the extracted rows.
  */
 export function HudCard({
-  headline = "Extracted Data",
+  headline,
   rows,
   source,
   className = "",
@@ -60,6 +63,7 @@ export function HudCard({
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
+  const { c } = useLang();
 
   const copy = async () => {
     const text = rows.map((r) => `${r.k}: ${r.v}`).join("\n");
@@ -79,12 +83,12 @@ export function HudCard({
       <div className="flex items-center justify-between border-b border-rule px-4 py-2.5">
         <span className="inline-flex items-center gap-2 mono-label text-bone/90">
           <EyeMark size={14} />
-          OmniEye HUD
+          {c.hud.hudTitle}
         </span>
         <span className="mono-label text-aureate tnum">240ms</span>
       </div>
       <div className="px-4 py-3">
-        <p className="mono-label text-graphite">{headline}</p>
+        <p className="mono-label text-graphite">{headline ?? c.hud.hudHeadline}</p>
         <dl className="mt-2 space-y-1.5">
           {rows.map((r) => (
             <div key={r.k} className="flex items-baseline justify-between gap-4">
