@@ -96,16 +96,19 @@ tracked(draw, (64, 420), "SAS — SEE · ANALYZE · SHOW", m19, AUREATE, 6)
 m15 = font(MONO, 15)
 tracked(draw, (64, 460), "INTENT-AWARE AI DESKTOP OVERLAY", m15, GRAPHITE, 2)
 
-# emblem badge top-right: bone rounded square + the real emblem
-emblem = Image.open("/home/z/my-project/public/brand/emblem.png").convert("RGB")
+# emblem badge top-right: bone rounded square + the client's emblem (RGBA)
+emblem = Image.open("/home/z/my-project/public/brand/emblem.png").convert("RGBA")
 badge = 84
-em = emblem.resize((badge - 8, badge - 8), Image.LANCZOS)
+em = emblem.copy()
+em.thumbnail((badge - 10, badge - 8), Image.LANCZOS)
 bx, by = 908, 40
 o = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 od = ImageDraw.Draw(o)
 od.rounded_rectangle((bx, by, bx + badge, by + badge), radius=10, fill=(234, 227, 210, 255))
+ex = bx + (badge - em.width) // 2
+ey = by + (badge - em.height) // 2
+o.alpha_composite(em, (ex, ey))
 im = Image.alpha_composite(im.convert("RGBA"), o).convert("RGB")
-im.paste(em, (bx + 4, by + 4))
 draw = ImageDraw.Draw(im)
 
 s30 = font(SANS_B, 30)

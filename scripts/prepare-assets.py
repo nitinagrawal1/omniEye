@@ -2,6 +2,11 @@
 """
 Prepare the client's real assets for the OmniEye landing page.
 
+NOTE (2026-11-13): the logo section of this script is SUPERSEDED.
+The client supplied a new emblem (WhatsApp image via postimg, processed by
+scripts/update-logo.py -> public/brand/emblem.png + src/app/icon.png +
+src/app/apple-icon.png). Do NOT re-run the logo part of this script.
+
 Asset map (per the build brief, section 6):
   img4  lasso-autocad  -> hero video-box poster (clean AutoCAD base screen)
   img6  multi-industry-b -> Healthcare visual (HIPAA chip covered + taskbar cropped)
@@ -10,7 +15,7 @@ Asset map (per the build brief, section 6):
   img2  hotkey         -> About filmstrip (toned)
   img3  privacy-panel  -> About filmstrip (toned)
   img7  storyboard-60s -> demo modal storyboard
-  logo  emblem         -> OG image badge, apple-icon
+  logo  emblem         -> OG image badge, apple-icon  [SUPERSEDED, see note]
 
 All web outputs are WebP with explicit sizes.
 """
