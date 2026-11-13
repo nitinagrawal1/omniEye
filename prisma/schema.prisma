@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Beta waitlist captured on the OmniEye landing page.
+// Doubles as the duplicate-email check when the Google Apps Script
+// webhook (WAITLIST_WEBHOOK_URL) is not configured.
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String
+  roleOther String?
+  pageUrl   String?
+  utm       String?
+  source    String   @default("landing")
+  createdAt DateTime @default(now())
+}
