@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { CropCorners } from "./chrome";
 import { CaptureChip } from "./hud";
 
@@ -118,7 +119,7 @@ export function Industries() {
   );
 }
 
-/* ── visuals, rebuilt live (no AI-rendered mockups on the page) ── */
+/* ── visuals: the client's real product captures, toned toward the palette ── */
 
 function ConceptTag() {
   return (
@@ -128,7 +129,15 @@ function ConceptTag() {
   );
 }
 
-function VisualFrame({ children, label }: { children: React.ReactNode; label: string }) {
+function VisualFrame({
+  children,
+  label,
+  caption,
+}: {
+  children: React.ReactNode;
+  label: string;
+  caption?: string;
+}) {
   return (
     <figure className="w-full max-w-[520px]">
       <div className="relative border border-rule bg-midnight">
@@ -141,6 +150,11 @@ function VisualFrame({ children, label }: { children: React.ReactNode; label: st
           {label}
         </span>
       </figcaption>
+      {caption ? (
+        <p className="mt-1 mono-label leading-relaxed text-graphite" style={{ fontSize: "10px" }}>
+          {caption}
+        </p>
+      ) : null}
     </figure>
   );
 }
@@ -170,63 +184,34 @@ function EducationVisual() {
 }
 
 function HealthcareVisual() {
-  const rows = [
-    ["TEST", "RESULT", "REF."],
-    ["HGB", "13.5", "13.0–17.0"],
-    ["WBC", "6.2", "4.0–10.0"],
-    ["PLT", "244", "150–400"],
-    ["HBA1C", "6.5", "4.0–5.6"],
-  ];
   return (
-    <VisualFrame label="FIG · H-01">
-      <div className="flex aspect-[16/10] flex-col justify-between p-5">
-        <div className="flex items-center justify-between">
-          <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-            LAB REPORT · TABLE VIEW
-          </span>
-          <span className="mono-label text-ember" style={{ fontSize: "10px" }}>
-            Privacy-first
-          </span>
-        </div>
-        <div className="relative border border-rule bg-ink/60">
-          <table className="w-full font-mono text-[11px]">
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={r[0]} className={i === 0 ? "text-graphite" : "text-bone/85"}>
-                  {r.map((cell, j) => (
-                    <td
-                      key={j}
-                      className={`border-b border-rule/60 px-3 py-1.5 text-left ${j === 0 ? "w-1/3" : ""}`}
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {/* lasso around the table */}
-          <svg
-            className="capture-glow absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)]"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <rect x="1" y="1" width="98" height="98" fill="none" stroke="#4D7CFF" strokeWidth="1.2" strokeDasharray="3 2.4" vectorEffect="non-scaling-stroke" />
-          </svg>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2 border border-rule bg-ink/85 px-3 py-1.5 mono-label text-bone/90" style={{ fontSize: "10px" }}>
-            <span className="h-1.5 w-1.5 rounded-full bg-sapphire" aria-hidden="true" />
-            Extracted Clinical Insights
-          </span>
-          <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-            Patient records protected
-          </span>
-        </div>
-        <p className="mono-label leading-relaxed text-graphite" style={{ fontSize: "10px" }}>
-          Illustrative concept. OmniEye is not a medical device.
-        </p>
+    <VisualFrame
+      label="FIG · H-01"
+      caption="Illustrative concept. OmniEye is not a medical device."
+    >
+      <div className="relative aspect-[16/10]">
+        {/* the client's patient-lab capture (HIPAA chip removed) */}
+        <Image
+          src="/mockups/healthcare-1208.webp"
+          alt="OmniEye overlay on a patient lab report, with extracted clinical insights: HbA1c, creatinine and cholesterol values correlated with a chest CT impression"
+          fill
+          sizes="(min-width: 768px) 520px, 100vw"
+          className="object-cover"
+        />
+        {/* tone toward ink/bone */}
+        <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-ink/20" />
+      </div>
+      <div className="flex items-center justify-between gap-3 border-t border-rule px-4 py-2.5">
+        <span
+          className="inline-flex items-center gap-2 mono-label text-bone/90"
+          style={{ fontSize: "10px" }}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-sapphire" aria-hidden="true" />
+          Extracted Clinical Insights
+        </span>
+        <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
+          Privacy-first
+        </span>
       </div>
     </VisualFrame>
   );
@@ -235,34 +220,28 @@ function HealthcareVisual() {
 function ItVisual() {
   return (
     <VisualFrame label="FIG · IT-01">
-      <div className="flex aspect-[16/10] flex-col justify-between p-5">
-        <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-          IDE · BUILD OUTPUT
+      <div className="relative aspect-[10/11]">
+        {/* the client's IDE capture — OmniEye HUD over the code editor */}
+        <Image
+          src="/mockups/it-code-542.webp"
+          alt="OmniEye HUD over a code editor, reporting that code structure analysis is complete with three warnings identified in server logs"
+          fill
+          sizes="(min-width: 768px) 520px, 100vw"
+          className="object-cover"
+        />
+        <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-ink/20" />
+      </div>
+      <div className="flex items-center justify-between gap-3 border-t border-rule px-4 py-2.5">
+        <span
+          className="inline-flex items-center gap-2 mono-label text-bone/90"
+          style={{ fontSize: "10px" }}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-sapphire" aria-hidden="true" />
+          Code structure analysis · inside your IDE
         </span>
-        <div className="relative flex-1 border border-rule bg-ink/70 p-3 font-mono text-[11px] leading-relaxed">
-          <p className="text-bone/80">$ tail -f build.log</p>
-          <p className="text-graphite">[12:04:11] compiling modules…</p>
-          <p className="text-ember">ERROR E-4821: type mismatch in span()!{" "}</p>
-          <p className="text-graphite">[12:04:12] 2 warnings, 1 error</p>
-          {/* lasso over the error line */}
-          <svg
-            className="capture-glow pointer-events-none absolute inset-x-2 top-[46%] h-[22%]"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <rect x="1" y="1" width="98" height="98" fill="rgba(77,124,255,0.10)" stroke="#4D7CFF" strokeWidth="1.2" strokeDasharray="3 2.4" vectorEffect="non-scaling-stroke" />
-          </svg>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2 border border-rule bg-ink/85 px-3 py-1.5 mono-label text-bone/90" style={{ fontSize: "10px" }}>
-            <span className="h-1.5 w-1.5 rounded-full bg-sapphire" aria-hidden="true" />
-            Fix suggested · inside your IDE
-          </span>
-          <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
-            No context switch
-          </span>
-        </div>
+        <span className="mono-label text-graphite" style={{ fontSize: "10px" }}>
+          No context switch
+        </span>
       </div>
     </VisualFrame>
   );

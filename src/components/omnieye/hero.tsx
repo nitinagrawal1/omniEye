@@ -1,9 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
-import { CadView } from "./cad-view";
 import { CropCorners } from "./chrome";
-import { CaptureChip } from "./hud";
 import { VideoModal } from "./video-modal";
 import { useMediaQuery } from "./hooks";
 
@@ -108,7 +107,7 @@ export function Hero({ demoVideoUrl }: { demoVideoUrl?: string | null }) {
                 <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">
                   <path d="M1 1 L11 7 L1 13 Z" fill="currentColor" />
                 </svg>
-                Watch 60-Second Demo
+                Watch the Demo
               </button>
             </div>
           </div>
@@ -128,12 +127,27 @@ export function Hero({ demoVideoUrl }: { demoVideoUrl?: string | null }) {
                 onClick={() => setOpen(true)}
                 className="group relative block w-full text-left"
                 aria-haspopup="dialog"
-                aria-label="Open the 60-second demo video"
+                aria-label="Open the OmniEye demo video"
               >
-                <CadView box className="aspect-video w-full" />
+                {/* the client's real AutoCAD capture — lasso + latency chip baked in */}
+                <Image
+                  src="/mockups/lasso-autocad-1376.webp"
+                  alt="OmniEye lasso selection around a structural detail in an AutoCAD floor plan, with a Lasso Context Capture chip showing 240 milliseconds"
+                  width={1376}
+                  height={768}
+                  priority
+                  sizes="(min-width: 1280px) 680px, (min-width: 768px) 60vw, 100vw"
+                  srcSet="/mockups/lasso-autocad-768.webp 768w, /mockups/lasso-autocad-1376.webp 1376w"
+                  className="aspect-video w-full border border-rule object-cover"
+                />
+                {/* tone the mockup toward the palette */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-ink/10"
+                />
                 {/* readout */}
                 <span className="absolute left-4 top-4 mono-label text-bone/90 tnum bg-ink/70 px-2.5 py-1.5 border border-rule">
-                  DEMO · 00:00 / 01:00
+                  DEMO · 00:00 / 00:15
                 </span>
                 {/* play button */}
                 <span className="absolute inset-0 flex items-center justify-center">
@@ -142,9 +156,6 @@ export function Hero({ demoVideoUrl }: { demoVideoUrl?: string | null }) {
                       <path d="M2 1.5 L16.5 10 L2 18.5 Z" fill="#EAE3D2" />
                     </svg>
                   </span>
-                </span>
-                <span className="absolute bottom-4 left-4">
-                  <CaptureChip />
                 </span>
               </button>
               <p className="mt-4 mono-label text-graphite">

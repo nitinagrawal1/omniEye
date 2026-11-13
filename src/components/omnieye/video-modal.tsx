@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { CadView } from "./cad-view";
 
@@ -10,6 +11,11 @@ function youtubeId(url: string): string | null {
 function vimeoId(url: string): string | null {
   const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
   return m ? m[1] : null;
+}
+/** Jumpshare share links embed through jumpshare.com/embed/<id>. */
+function jumpshareEmbed(url: string): string | null {
+  const m = url.match(/jumpshare\.com\/(?:share\/|embed\/|v\/)?([A-Za-z0-9]{14,})/);
+  return m ? `https://jumpshare.com/embed/${m[1]}` : null;
 }
 
 /**
@@ -29,20 +35,22 @@ export function VideoModal({
   if (demoVideoUrl) {
     const yt = youtubeId(demoVideoUrl);
     const vm = vimeoId(demoVideoUrl);
+    const js = jumpshareEmbed(demoVideoUrl);
     if (yt) embed = { kind: "iframe", src: `https://www.youtube-nocookie.com/embed/${yt}?rel=0` };
     else if (vm) embed = { kind: "iframe", src: `https://player.vimeo.com/video/${vm}` };
+    else if (js) embed = { kind: "iframe", src: js };
     else if (/\.(mp4|webm|mov)(\?.*)?$/i.test(demoVideoUrl)) embed = { kind: "video", src: demoVideoUrl };
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-[calc(100%-1.5rem)] sm:max-w-4xl rounded-none border-rule bg-ink p-0 gap-0 overscroll-contain"
+        className="max-w-[calc(100%-1.5rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-4xl rounded-none border-rule bg-ink p-0 gap-0 overscroll-contain"
         aria-describedby={undefined}
       >
-        <div className="flex items-center justify-between border-b border-rule px-4 py-3 md:px-5">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-rule bg-ink px-4 py-3 md:px-5">
           <DialogTitle className="mono-label text-bone/90 font-normal tracking-[0.18em] uppercase">
-            Demo · 00:00 / 01:00
+            Demo · 00:00 / 00:15
           </DialogTitle>
           <DialogClose
             className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center border border-rule text-bone/80 transition-colors hover:border-aureate hover:text-aureate"
@@ -54,22 +62,58 @@ export function VideoModal({
           </DialogClose>
         </div>
         <DialogDescription className="sr-only">
-          OmniEye 60-second product demo video.
+          OmniEye product demo video.
         </DialogDescription>
 
         {embed ? (
-          <div className="aspect-video w-full bg-midnight">
-            {embed.kind === "iframe" ? (
-              <iframe
-                src={embed.src}
-                title="OmniEye 60-second demo"
-                className="h-full w-full"
-                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                allowFullScreen
+          <div>
+            <div className="aspect-video w-full bg-midnight">
+              {embed.kind === "iframe" ? (
+                <iframe
+                  src={embed.src}
+                  title="OmniEye product demo"
+                  className="h-full w-full"
+                  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen; autoplay"
+                  allowFullScreen
+                />
+              ) : (
+                <video src={embed.src} controls preload="none" className="h-full w-full" />
+              )}
+            </div>
+            {/* fallback for strict browsers / extensions that block third-party players */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-4 py-3 md:px-5">
+              <span className="mono-label text-graphite">
+                PLAYER BLOCKED?{" "}
+                <a
+                  href={demoVideoUrl?.includes("jumpshare.com")
+                    ? `https://jumpshare.com/share/${demoVideoUrl.split("/").pop()}`
+                    : demoVideoUrl ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-bone/90 underline decoration-rule underline-offset-4 transition-colors hover:text-aureate"
+                >
+                  Watch on the host site ↗
+                </a>
+              </span>
+              <span className="mono-label text-graphite">15 SECONDS · NO AUTOPLAY</span>
+            </div>
+            {/* production reference: the full 60-second walkthrough plan */}
+            <figure className="border-t border-rule px-4 py-5 md:px-5">
+              <figcaption className="flex flex-wrap items-center justify-between gap-2">
+                <span className="mono-label text-aureate">FIG · SB-01</span>
+                <span className="mono-label text-graphite">
+                  FULL 60-SECOND WALKTHROUGH · PRODUCTION REFERENCE
+                </span>
+              </figcaption>
+              <Image
+                src="/mockups/storyboard-1100.webp"
+                alt="Four-panel storyboard of the OmniEye demo: opening AutoCAD and a PDF side by side, activating the overlay with Alt plus Space, lassoing a beam schedule, and the extracted beam information answer"
+                width={1100}
+                height={733}
+                sizes="(min-width: 640px) 896px, 100vw"
+                className="mt-4 w-full border border-rule"
               />
-            ) : (
-              <video src={embed.src} controls preload="none" className="h-full w-full" />
-            )}
+            </figure>
           </div>
         ) : (
           <div className="relative">

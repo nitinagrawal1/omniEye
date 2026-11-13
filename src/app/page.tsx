@@ -9,8 +9,10 @@ import { FinalCTA } from "@/components/omnieye/final-cta";
 import { SiteFooter } from "@/components/omnieye/footer";
 
 export default function LandingPage() {
-  // One config value for the final demo video (YouTube / Vimeo / MP4).
-  const demoVideoUrl = process.env.DEMO_VIDEO_URL || null;
+  // One config value for the final demo video (YouTube / Vimeo / MP4 /
+  // Jumpshare). Defaults to the client's delivered 15-second Jumpshare demo.
+  const demoVideoUrl =
+    process.env.DEMO_VIDEO_URL || "https://jumpshare.com/embed/S18O80bFo59a70lm79Tf";
 
   return (
     <div className="flex min-h-screen flex-col bg-ink">

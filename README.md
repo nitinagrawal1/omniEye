@@ -35,17 +35,28 @@ privacy/page.tsx).
 
 ## Demo video (one config value)
 
-The hero button and video box open an accessible modal. Set:
+The hero button and video box open an accessible modal. The client's delivered
+demo (15-second walkthrough, hosted on Jumpshare) is wired in as the default;
+override it any time with:
 
 ```bash
-DEMO_VIDEO_URL="https://www.youtube.com/watch?v=XXXXXXXXXXX"   # or Vimeo / .mp4
+DEMO_VIDEO_URL="https://jumpshare.com/embed/S18O80bFo59a70lm79Tf"  # Jumpshare
+DEMO_VIDEO_URL="https://www.youtube.com/watch?v=XXXXXXXXXXX"       # or YouTube
+DEMO_VIDEO_URL="https://player.vimeo.com/video/000000"             # or Vimeo
+DEMO_VIDEO_URL="https://cdn.example.com/demo.mp4"                  # or direct file
 ```
 
-YouTube links are embedded via `youtube-nocookie.com`; Vimeo via the Vimeo
-player; direct `.mp4/.webm/.mov` links play in a native `<video>` element.
-Nothing autoplays. If the variable is empty, the modal shows a clean
+Supported: Jumpshare share/embed links (embedded via `jumpshare.com/embed`),
+YouTube via `youtube-nocookie.com`, Vimeo via the Vimeo player, and direct
+`.mp4/.webm/.mov` links in a native `<video>` element. Nothing autoplays.
+If the variable is set to an empty string, the modal falls back to a clean
 placeholder (poster frame + "Demo video coming soon" + a button to the
 waitlist form).
+
+Real product assets (hero poster, industry captures, concept frames,
+storyboard, emblem) live in `public/mockups/` and `public/brand/`; regenerate
+them from the originals with `python3 scripts/prepare-assets.py`, and the OG
+image with `python3 scripts/generate-og.py`.
 
 ## Waitlist integration (Google Sheet + email notification)
 
